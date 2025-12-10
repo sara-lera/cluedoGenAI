@@ -18,7 +18,7 @@ if sys.platform == "win32":
         signal.SIGTSTP = signal.SIGTERM
         signal.SIGCONT = signal.SIGTERM
 
-load_dotenv()
+load_dotenv() # Tiene en cuenta el archivo .env que contiene la API key
 
 
 # ✅ Añadir la carpeta src al PYTHONPATH para que se vea cluedogenai
@@ -123,7 +123,6 @@ def generate_case_with_crew() -> Dict:
            "personality": ...,
            "secret": ...,
            "guilty": bool,
-           "alibi": ...
          },
          ...
       ],
@@ -185,8 +184,9 @@ def generate_case_with_crew() -> Dict:
                 if "scene_id" in data and "present_characters" in data:
                     scene_blueprint_json = data
                 # Personajes (acepta guilty_name o killer_id)
-                if "suspects" in data and ("guilty_name" in data or "killer_id" in data):
+                if "suspects" in data:
                     characters_json = data
+
 
         # Caso: dict mapeado por nombre de task
         elif isinstance(tasks_out, dict):
@@ -313,7 +313,6 @@ def generate_case_with_crew() -> Dict:
                     or s.get("name") == guilty_name
                     or s.get("id") == characters_json.get("killer_id")
                 ),
-                "alibi": s.get("alibi", ""),
             }
         )
 
@@ -627,7 +626,7 @@ def _generate_epilogue(case: Dict, accused_name: str, won: bool, guilty_name: st
         return (
             f"You lay out the last contradiction, and the room goes quiet.\n\n"
             f"{guilty_name} stops arguing and starts calculating. The storm outside fades, "
-            "but the weight of the evidence doesn’t. Logs, timelines, a misplaced alibi — "
+            "but the weight of the evidence doesn’t. Logs, timelines — "
             "all of it lines up in a single, sharp line pointing at them.\n\n"
             "Security walks them out. The office hums back to life, one monitor at a time."
         )
@@ -769,7 +768,6 @@ def render_game() -> None:
             <div style="border:1px solid rgba(0,0,0,0.08); border-radius:16px; padding:12px 14px; background:#ffffff;">
               <div style="font-weight:700; font-size:16px;">{escape(s['name'])}</div>
               <div style="opacity:0.8;">{escape(s['role'])} · {escape(s['personality'])}</div>
-              <div style="margin-top:8px; opacity:0.9;"><b>Alibi:</b> {escape(s['alibi'])}</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -828,7 +826,6 @@ def render_game() -> None:
             st.markdown(
                 """
                 - Ask about **timestamps**, **locations**, and **what they touched** (devices, doors, logs).
-                - Push on their **alibi details**: who can confirm, what exactly they saw.
                 - Look for **subtle contradictions**: wrong sequence, wrong room, wrong system.
                 """
             )

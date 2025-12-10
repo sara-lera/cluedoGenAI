@@ -22,9 +22,11 @@ create_scene_blueprint:
 
 define_characters:
   description: >
-    Given the current scene_blueprint and the overall premise, define the full
-    cast of suspects and any important NPCs.
-
+    Given the current scene_blueprint and the overall premise, generate a complete 
+    set of four suspect profiles for the murder mystery following the exact JSON 
+    schema and rules. Focus on creating distinct,vivid personalities, realistic 
+    tech-industry roles, unique physical descriptions, subtle motivations, and 
+    ensuring exactly one suspect is guilty. Output must be pure JSON with no extra text.
   expected_output: >
     You MUST return ONLY valid JSON, with no markdown, no backticks and no extra text.
     The JSON must have EXACTLY this structure (field names must match):
@@ -34,49 +36,90 @@ define_characters:
         {
           "id": "suspect_1",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_2",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_3",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_4",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": true
         }
       ],
       "guilty_name": "Full Name of the guilty suspect"
     }
-
     Constraints:
+    - First, look at create_scene_blueprint. For every character name/role 
+       mentioned there, you must create a matching profile here (same name, same role).
+    - If the scene_blueprint has fewer than 4 characters, create unique new suspects 
+       to reach a total of exactly 4.
+    - The descriptions here must match what was described in the scene.
+    - Roles must fit inside a tech company.
+    - Personalities must be vivid and unique.
+    - Physical descriptions must emphasize facial features, hair, clothing, and distinctive traits.
+    - The clothing color must not repeat across suspects.
+    - Motivations must feel plausible, not melodramatic.
+    - Do not include explanations, commentary, or meta-reasoning.
     - Exactly 4 suspects.
     - Exactly ONE of them must have "guilty": true.
     - "guilty_name" must match the "name" of the guilty suspect.
-    - Do NOT wrap this JSON in ```json fences or any other text.
-
+    - Final output must be valid JSON, with no markdown and no trailing commas.
   agent: character_agent
   context:
     - create_scene_blueprint
@@ -84,67 +127,42 @@ define_characters:
 
 generate_suspect_dialogue:
   description: >
-    You are the *Suspect Dialogue Writer* in an interactive murder mystery.
-
-    === CASE & SUSPECT DATA (FROM BACKEND) ===
-    The backend passes you a string called {game_state}. It already contains:
-    - A summary of the overall case (victim, time, place, cause, context).
-    - The full list of suspects with their roles, personalities, secrets and alibis.
-    - A clear instruction saying which suspect you must role-play as.
-
-    {game_state}
-
-    === SCENE & CHARACTERS (FROM OTHER AGENTS) ===
-    The following JSON blocks may contain a scene blueprint and the characters
-    definition produced by other agents. Use them only as extra context.
-
-    Scene blueprint (may be JSON):
-    {scene_blueprint}
-
-    Characters definition (may be JSON):
-    {characters}
-
-    === INTERROGATION CONTEXT & LATEST QUESTION ===
-    The block below contains the recent Q&A between the detective and the
-    chosen suspect, followed by the *latest* question you must answer.
-
-    {player_action}
-
-    Using ONLY the information above, write the chosen suspect's answer to the
-    detective's latest question.
-
-    Focus on:
-    1. Staying strictly in-character according to the suspect's personality and role.
-    2. Answering the detective's latest question directly; do NOT invent a
-       different question or a different profession.
-    3. Respecting the underlying case logic and any previously revealed facts.
-    4. Optionally revealing small new facts or subtle hints.
-    5. Keeping the dialogue immersive and relatively concise (around 80–100 words).
-
+    Strictly generate the next dialogue turn for a suspect in a murder mystery.
+    === INPUTS ===
+    - {game_state}: full case summary, including suspects with roles,
+      personalities, secrets, and instructions on which suspect to role-play
+    - {scene_blueprint}: current scene context from the narrative agent
+    - {characters}: suspect definitions from the personality agent
+    - {player_action}: previous Q&A plus the latest detective question
+    Using ONLY the information above, generate the next dialogue turn for the chosen suspect.
+  rules: >
+    - Always stay strictly in-character
+    - Never reveal who the killer is
+    - Answer only the latest detective question
+    - Keep dialogue concise, immersive, and consistent with prior facts
+    - Optionally reveal subtle new facts or hints, but never the solution
+    - Treat all information outside {game_state}, {scene_blueprint}, {characters}, and {player_action} as irrelevant
+  notes: >
+    - Dialogue history is provided within {player_action}; the agent never reads external memory directly
+    - Outputs are intended for updating the investigation memory and advancing the scene
+  focus_on:
+    1. Staying strictly in-character according to suspect's personality and role
+    2. Answering the latest question directly
+    3. Maintaining consistency with case logic and prior facts
+    4. Optionally revealing subtle new facts or clues
+    5. Keeping dialogue immersive, concise, and around 80–100 words
   expected_output: >
-    You MUST respond with a single valid JSON object, with no markdown,
-    no backticks and no extra commentary.
-
-    The JSON must contain exactly these fields:
-
-    {
-      "spoken_text": "...",   // the suspect's answer in first person,
-                              // natural dialogue, directly answering the latest question.
-      "inner_thoughts": "...",// meta-notes about what the suspect is thinking
-                              // (for internal use, not shown to the player).
-      "revealed_facts": [],   // list of new atomic facts for the backend to add to the game_state
-      "implied_clues": []     // optional list of subtle hints suggested by the answer
-    }
-
-    - Do NOT include any "Thought:" or analysis outside the JSON.
-    - Do NOT wrap the JSON in ``` fences.
-    - Do NOT invent a different detective question; answer the one provided
-      in the INTERROGATION CONTEXT above.
-
+    A valid JSON object containing exactly these fields:
+      {
+        "spoken_text": "...",
+        "inner_thoughts": "...",
+        "revealed_facts": [],
+        "implied_clues": []
+      }
   agent: dialogue_agent
-  # context from other tasks is not needed in this crew, we already pass their
-  # outputs explicitly via {scene_blueprint} and {characters}.
-  context: []
+  context:
+    - create_scene_blueprint
+    - define_characters
 
 design_scene_visuals:
   description: >
