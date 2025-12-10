@@ -22,8 +22,12 @@ create_scene_blueprint:
 
 define_characters:
   description: >
-    Given the current scene_blueprint and the overall premise, define the full
-    cast of suspects and any important NPCs.
+    Given the current scene_blueprint and the overall premise, generate a complete 
+    set of four suspect profiles for the murder mystery following the exact JSON 
+    schema and rules. Focus on creating distinct,vivid personalities, realistic 
+    tech-industry roles, unique physical descriptions, subtle motivations, and 
+    ensuring exactly one suspect is guilty. Output must be pure JSON with no extra text.
+
 
   expected_output: >
     You MUST return ONLY valid JSON, with no markdown, no backticks and no extra text.
@@ -34,36 +38,68 @@ define_characters:
         {
           "id": "suspect_1",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_2",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_3",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
         {
           "id": "suspect_4",
           "name": "Full Name",
-          "role": "Job/position in the tech company",
+          "role": "Job/position in the tech company"
+          "age": integer,
           "personality": "Short description (1–2 sentences)",
-          "secret": "Hidden goal, fear or conflict",
+          "physical_description": {
+            "build": "skinny|fit|fat",
+            "face": "short phrase describing facial traits",
+            "hair": "short phrase describing hairstyle/color",
+            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
+            "distinctive_features": "short phrase (tattoos, posture, accessories)"
+            },
+          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": true
         }
@@ -72,9 +108,16 @@ define_characters:
     }
 
     Constraints:
+    - Roles must fit inside a tech company.
+    - Personalities must be vivid and unique.
+    - Physical descriptions must emphasize facial features, hair, clothing, and distinctive traits.
+    - The clothing color must not repeat across suspects.
+    - Motivations must feel plausible, not melodramatic.
+    - Do not include explanations, commentary, or meta-reasoning.
     - Exactly 4 suspects.
     - Exactly ONE of them must have "guilty": true.
     - "guilty_name" must match the "name" of the guilty suspect.
+    - Final output must be valid JSON, with no markdown and no trailing commas.
     - Do NOT wrap this JSON in ```json fences or any other text.
 
   agent: character_agent
