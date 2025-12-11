@@ -12,6 +12,9 @@ import signal
 from dotenv import load_dotenv
 import streamlit as st
 
+from music_manager import scan_tracks, choose_random_bg_url, choose_random_sfx_url
+import time
+
 if sys.platform == "win32":
     if not hasattr(signal, "SIGHUP"):
         signal.SIGHUP = signal.SIGTERM
@@ -598,6 +601,9 @@ def handle_question_submit(suspect_name: str, question: str, disabled: bool) -> 
     if st.session_state.remaining_questions <= 0:
         st.warning("No questions left — you must accuse someone.")
         return
+    
+    # 🔊 Suena sonido de pregunta
+
 
     case = st.session_state.case
     history = st.session_state.histories[suspect_name]
@@ -647,6 +653,7 @@ def handle_accusation(accused_name: str, disabled: bool) -> None:
         return
     if st.session_state.game_over:
         return
+    # 🔊 Suena sonido de acusación
 
     case = st.session_state.case
     guilty_name = st.session_state.guilty_name
@@ -662,6 +669,8 @@ def handle_accusation(accused_name: str, disabled: bool) -> None:
         "epilogue": epilogue,
     }
     st.session_state.game_over = True
+
+    # 🔊 Suena sonido de ending
 
 
 # =========================
@@ -820,6 +829,7 @@ def render_game() -> None:
                 )
             st.markdown("#### Epilogue")
             st.write(out["epilogue"])
+            render_music_player()
 
         elif st.session_state.game_over:
             st.info("Case closed. Reset to play again.")
@@ -836,6 +846,7 @@ def render_game() -> None:
 
 def main() -> None:
     st.set_page_config(page_title="AI Murder Mystery", page_icon="🕵️", layout="wide")
+
     render_game()
 
 
